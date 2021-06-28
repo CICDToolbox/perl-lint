@@ -25,7 +25,7 @@ matrix:
     name: YAML Linting (rvm 3.0)
     rvm: 3.0
     before_install:
-    - git clone https://github.com/TravisToolbox/yaml-lint
+    - git clone https://github.com/CICDToolbox/yaml-lint
     install:
     - "./yaml-lint/install.sh"
     script:
@@ -35,7 +35,7 @@ matrix:
     os: linux
     arch: arm64-graviton2
     before_install:
-    - git clone https://github.com/TravisToolbox/shellcheck
+    - git clone https://github.com/CICDToolbox/shellcheck
     install:
     - "./shellcheck/install.sh"
     script:
@@ -47,7 +47,7 @@ matrix:
     - WHITELIST="https://img.shields.io"
     - EXCLUDE_FILES="CHANGELOG.md"
     before_install:
-    - git clone https://github.com/TravisToolbox/awesomebot
+    - git clone https://github.com/CICDToolbox/awesomebot
     install:
     - "./awesomebot/install.sh"
     script:
