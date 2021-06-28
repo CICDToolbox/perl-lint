@@ -1,0 +1,58 @@
+matrix:
+  include:
+  - language: perl
+    name: Compatibility Test (Perl 5.30)
+    perl: 5.3
+    install:
+    - "./install.sh"
+    script:
+    - "./scan.sh"
+  - language: perl
+    name: Compatibility Test (Perl 5.32)
+    perl: 5.32
+    install:
+    - "./install.sh"
+    script:
+    - "./scan.sh"
+  - language: perl
+    name: Compatibility Test (Perl 5.33)
+    perl: 5.33
+    install:
+    - "./install.sh"
+    script:
+    - "./scan.sh"
+  - language: ruby
+    name: YAML Linting (rvm 3.0)
+    rvm: 3.0
+    before_install:
+    - git clone https://github.com/TravisToolbox/yaml-lint
+    install:
+    - "./yaml-lint/install.sh"
+    script:
+    - "./yaml-lint/scan.sh"
+  - language: bash
+    name: Shellcheck (Bash)
+    os: linux
+    arch: arm64-graviton2
+    before_install:
+    - git clone https://github.com/TravisToolbox/shellcheck
+    install:
+    - "./shellcheck/install.sh"
+    script:
+    - "./shellcheck/scan.sh"
+  - language: ruby
+    name: Link Checking (rvm 3.0)
+    rvm: 3.0
+    env:
+    - WHITELIST="https://img.shields.io"
+    - EXCLUDE_FILES="CHANGELOG.md"
+    before_install:
+    - git clone https://github.com/TravisToolbox/awesomebot
+    install:
+    - "./awesomebot/install.sh"
+    script:
+    - "./awesomebot/scan.sh"
+notifications:
+  email: false
+  slack:
+    secure: TjXAx8CY6KRfLinT2NwvqI6vPAGunD5F8EVC/8vXKiRpIBn6U0tRONdKQ0pg52cTPYzOZ1+2qlM+2ttUgkvADkFhTs4Y4MN3IXiYLpO6x8z0cTWp6UFN7+QsawaKjd0NAwRApaZ93GYJZzt5BQ/yuf5xmd8v/h97KJ0AC7K9D3CFuuTEfIWAkCeAXvjYIggjgYlcx/n+tEbavBQ5D9ZHSCB5zhUVi8YMvRSWCJbqozeeWFBHEypp5KJU+VVHu8EoaMgn8VafvNi1e3rKXiIzAAasn9FrtjGj0ZmcrUQypC/BxM26+8BdcNIN1q+xxScGdKconiejJOv3/mE0C9e9c2zIrXB6esPuB9BoSbGHLNPSVb7VldSpVnO+FWO9iKUYxzwOH4ZSwPvY8nZKGXIJY9yH6QcKKpnSp4rhCcGzgISR5gp92sgdMJYT4+thOfDNmBNUxwMrFVOsXqKzGsfckw9Np9aCE2NuNvYyN5P3QnsmmIg6vdYotZsWh/VzbVV3o2tjio1yUVh9Ty0Kj+Q6aTM1Ubjro1qy0t1NK49m5awbKxibkVmy8quw78yiNn9mNTpqvaPHAT8jaWwAv7bcFro2VEqGX0POXGcJtPqmqgL9jMls0IUr1fGUPkmUyTdnHpIWMECI+0q65x8ffLq7ZhNhsf/mcIIPZEcdoZ1Ajqs=
