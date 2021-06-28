@@ -9,6 +9,8 @@ This changelog was automatically generated using [Caretaker](https://github.com/
 
 - testing [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
 
+- testing [`[d360607]`](https://github.com/CICDToolbox/perl-lint/commit/d36060718fb4ae4eb5b47868f2a353e978a989d5)
+
 - testing [`[c03b7ef]`](https://github.com/CICDToolbox/perl-lint/commit/c03b7eff874ac2f3b3eb3aa72b71338938c7665c)
 
 - testing [`[16f774a]`](https://github.com/CICDToolbox/perl-lint/commit/16f774a6da483a46afe67985191dce4dff2737b8)

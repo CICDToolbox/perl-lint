@@ -3,10 +3,17 @@ on: [push, pull_request]
     
 jobs:
   build-testing:
-    name: Local Build Test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        perl: [ '5.34' ]
+    name: Build Test on Perl ${{ matrix.perl }}
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Perl ${{ matrix.perl }}
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
       - name: Run Perl Lint
         run: ./pipeline.sh
   awesomebot:
