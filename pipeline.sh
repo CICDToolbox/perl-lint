@@ -40,6 +40,8 @@ function install_prerequisites
 #    sudo apt-get -qq install "${INSTALL_PACKAGE}"
 #    TEST_COMMAND=$(which jq)
 
+perl --version
+
     VERSION=$("${INSTALL_PACKAGE}" -e 'print substr($^V, 1)');
     BANNER="Scanning all Perl scripts with ${INSTALL_PACKAGE} (version: ${VERSION})"
 }
