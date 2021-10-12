@@ -23,10 +23,10 @@ set -Eeuo pipefail
 # EXIT_VALUE - Used to store the script exit value - adjusted by the fail().       #
 # -------------------------------------------------------------------------------- #
 
-INSTALL_PACKAGE='perl'
-INSTALL_COMMAND="true"
+INSTALL_COMMAND="sudo apt install qq -y perl"
 
-TEST_COMMAND='perl -Mstrict -cw'
+TEST_COMMAND='perl'
+TEST_FLAGS='-Mstrict -cw'
 FILE_TYPE_SEARCH_PATTERN='Perl script'
 FILE_NAME_SEARCH_PATTERN='\.pl$'
 
@@ -43,7 +43,7 @@ function install_prerequisites
 {
     stage "Install Prerequisites"
 
-    if ! command -v ${INSTALL_PACKAGE} &> /dev/null
+    if ! command -v ${TEST_COMMAND} &> /dev/null
     then
         if errors=$( ${INSTALL_COMMAND} 2>&1 ); then
             success "${INSTALL_COMMAND}"
@@ -52,7 +52,7 @@ function install_prerequisites
             exit $EXIT_VALUE
         fi
     else
-        success "${INSTALL_PACKAGE} is alredy installed"
+        success "${TEST_COMMAND} is alredy installed"
     fi
 }
 
@@ -64,8 +64,8 @@ function install_prerequisites
 
 function get_version_information
 {
-    VERSION=$("${INSTALL_PACKAGE}" -e 'print substr($^V, 1)');
-    BANNER="Run ${INSTALL_PACKAGE} (v${VERSION})"
+    VERSION=$("${TEST_COMMAND}" -e 'print substr($^V, 1)');
+    BANNER="Run ${TEST_COMMAND} (v${VERSION})"
 }
 
 # -------------------------------------------------------------------------------- #
@@ -81,7 +81,7 @@ function check()
 
     file_count=$((file_count+1))
 
-    if errors=$( ${TEST_COMMAND} "${filename}" 2>&1 ); then
+    if errors=$( ${TEST_COMMAND} ${TEST_FLAGS} "${filename}" 2>&1 ); then
         success "${filename}"
         ok_count=$((ok_count+1))
     else
