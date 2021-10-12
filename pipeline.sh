@@ -184,7 +184,7 @@ function success()
     local message="${1:-}"
 
     if [[ -n "${message}" ]]; then
-        printf ' [  %s%sOK%s  ] Processing successful for %s\n' "${bold}" "${success}" "${normal}" "${message}"
+        printf ' [  %s%sOK%s  ] %s\n' "${bold}" "${success}" "${normal}" "${message}"
     fi
 }
 
