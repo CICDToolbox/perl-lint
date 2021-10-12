@@ -226,7 +226,7 @@ function skip()
 
     file_count=$((file_count+1))
     if [[ -n "${message}" ]]; then
-        printf ' [ %s%sSkip%s ] Skipping %s\n' "${bold}" "${skip}" "${normal}" "${message}"
+        printf ' [ %s%sSkip%s ] Skipping %s\n' "${bold}" "${skipped}" "${normal}" "${message}"
     fi
 }
 
