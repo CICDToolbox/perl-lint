@@ -24,21 +24,48 @@ set -Eeuo pipefail
 # -------------------------------------------------------------------------------- #
 
 INSTALL_PACKAGE='perl'
+INSTALL_COMMAND="true"
+
 TEST_COMMAND='perl -Mstrict -cw'
 FILE_TYPE_SEARCH_PATTERN='Perl script'
 FILE_NAME_SEARCH_PATTERN='\.pl$'
+
 EXIT_VALUE=0
+CURRENT_STAGE=0
 
 # -------------------------------------------------------------------------------- #
-# Install                                                                          #
+# Install Prerequisites                                                            #
 # -------------------------------------------------------------------------------- #
 # Install the required tooling.                                                    #
 # -------------------------------------------------------------------------------- #
 
 function install_prerequisites
 {
+    stage "Install Prerequisites"
+
+    if ! command -v ${INSTALL_PACKAGE} &> /dev/null
+    then
+        if errors=$( ${INSTALL_COMMAND} 2>&1 ); then
+            success "${INSTALL_COMMAND}"
+        else
+            fail "${INSTALL_COMMAND}" "${errors}" true
+            exit $EXIT_VALUE
+        fi
+    else
+        success "${INSTALL_PACKAGE} is alredy installed"
+    fi
+}
+
+# -------------------------------------------------------------------------------- #
+# Get Version Information                                                          #
+# -------------------------------------------------------------------------------- #
+# Get the current version of the required tool.                                    #
+# -------------------------------------------------------------------------------- #
+
+function get_version_information
+{
     VERSION=$("${INSTALL_PACKAGE}" -e 'print substr($^V, 1)');
-    BANNER="Scanning all Perl scripts with ${INSTALL_PACKAGE} (version: ${VERSION})"
+    BANNER="Run ${INSTALL_PACKAGE} (v${VERSION})"
 }
 
 # -------------------------------------------------------------------------------- #
@@ -64,6 +91,24 @@ function check()
 }
 
 # -------------------------------------------------------------------------------- #
+# Is Excluded                                                                      #
+# -------------------------------------------------------------------------------- #
+# Check to see if the filename is in the exclude_list.                             #
+# -------------------------------------------------------------------------------- #
+
+function is_excluded()
+{
+    local needle=$1
+
+    for i in "${exclude_list[@]}"; do
+        if [[ $i == "${needle}" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# -------------------------------------------------------------------------------- #
 # Scan Files                                                                       #
 # -------------------------------------------------------------------------------- #
 # Locate all of the relevant files within the repo and process compatible ones.    #
@@ -73,10 +118,15 @@ function scan_files()
 {
     while IFS= read -r filename
     do
-        if file -b "${filename}" | grep -qE "${FILE_TYPE_SEARCH_PATTERN}"; then
-            check "${filename}"
-        elif [[ "${filename}" =~ ${FILE_NAME_SEARCH_PATTERN} ]]; then
-            check "${filename}"
+        if is_excluded "${filename}"; then
+            skip "${filename}"
+            skip_count=$((skip_count+1))
+        else
+            if file -b "${filename}" | grep -qE "${FILE_TYPE_SEARCH_PATTERN}"; then
+                check "${filename}"
+            elif [[ "${filename}" =~ ${FILE_NAME_SEARCH_PATTERN} ]]; then
+                check "${filename}"
+            fi
         fi
     done < <(git ls-files | sort -zVd)
 }
@@ -89,25 +139,37 @@ function scan_files()
 
 function handle_parameters
 {
-    if [[ -n "${SHOW_ERRORS-}" ]]; then
-        if [[ "${SHOW_ERRORS}" != true ]]; then
-            SHOW_ERRORS=false
-        fi
-    else
-        SHOW_ERRORS=false
-    fi
+    local parameters=false
 
-    if [[ -n "${REPORT_ONLY-}" ]]; then
-        if [[ "${REPORT_ONLY}" != true ]]; then
-            REPORT_ONLY=false
-        fi
+    stage "Parameters"
+
+    if [[ -n "${REPORT_ONLY-}" ]] && [[ "${REPORT_ONLY}" = true ]]; then
+        REPORT_ONLY=true
+        echo " Report Only: true"
+        parameters=true
     else
         REPORT_ONLY=false
     fi
 
-    if [[ "${REPORT_ONLY}" == true ]]; then
-        center_text "WARNING: REPORT ONLY MODE"
-        draw_line
+    if [[ -n "${SHOW_ERRORS-}" ]] && [[ "${SHOW_ERRORS}" = true ]]; then
+        SHOW_ERRORS=true
+        echo " Show Errors: true"
+        parameters=true
+    else
+        SHOW_ERRORS=false
+    fi
+
+    if [[ -n "${EXCLUDE_FILES-}" ]]; then
+        IFS=',' read -r -a exclude_list <<< "${EXCLUDE_FILES}"
+        echo " Excluded: ${EXCLUDE_FILES}"
+        parameters=true
+    else
+        # shellcheck disable=SC2034
+        declare -a exclude_list=()
+    fi
+
+    if [[ "${parameters}" != true ]]; then
+        echo " No parameters given"
     fi
 }
 
@@ -137,14 +199,15 @@ function fail()
 {
     local message="${1:-}"
     local errors="${2:-}"
+    local override="${3:-}"
 
     if [[ -n "${message}" ]]; then
-        printf ' [ %s%sFAIL%s ] Processing failed for %s\n' "${bold}" "${error}" "${normal}" "${message}"
+        printf ' [ %s%sFAIL%s ] %s\n' "${bold}" "${error}" "${normal}" "${message}"
     fi
 
-    if [[ "${SHOW_ERRORS}" == true ]]; then
+    if [[ "${SHOW_ERRORS}" == true ]] || [[ "${override}" == true ]] ; then
         if [[ -n "${errors}" ]]; then
-            echo "${errors}"
+            echo " ${errors}"
         fi
     fi
 
@@ -168,22 +231,6 @@ function skip()
 }
 
 # -------------------------------------------------------------------------------- #
-# Center Text                                                                      #
-# -------------------------------------------------------------------------------- #
-# Center the given string on the screen. Part of the report generation.            #
-# -------------------------------------------------------------------------------- #
-
-function center_text()
-{
-    local message="${1:-}"
-
-    textsize=${#message}
-    span=$(((screen_width + textsize) / 2))
-
-    printf '%*s\n' "${span}" "${message}"
-}
-
-# -------------------------------------------------------------------------------- #
 # Draw Line                                                                        #
 # -------------------------------------------------------------------------------- #
 # Draw a line on the screen. Part of the report generation.                        #
@@ -195,29 +242,51 @@ function draw_line
 }
 
 # -------------------------------------------------------------------------------- #
-# Header                                                                           #
+# Align Right                                                                      #
 # -------------------------------------------------------------------------------- #
-# Draw the report header on the screen. Part of the report generation.             #
+# Draw text alined to the right hand side of the screen.                           #
 # -------------------------------------------------------------------------------- #
 
-function header
+function align_right()
 {
-    draw_line
-    center_text "${BANNER}"
-    draw_line
+    local message="${1:-}"
+    local offset="${2:-2}"
+    local width=$screen_width
+
+    local textsize=${#message}
+    local left_line='-' left_width=$(( width - (textsize + offset + 2) ))
+    local right_line='-' right_width=${offset}
+
+    while ((${#left_line} < left_width)); do left_line+="$left_line"; done
+    while ((${#right_line} < right_width)); do right_line+="$right_line"; done
+
+    printf '%s %s %s\n' "${left_line:0:left_width}" "${1}" "${right_line:0:right_width}"
 }
 
 # -------------------------------------------------------------------------------- #
-# Footer                                                                           #
+# Stage                                                                            #
+# -------------------------------------------------------------------------------- #
+# Set the current stage number and display the message.                            #
+# -------------------------------------------------------------------------------- #
+
+function stage()
+{
+    message=${1:-}
+
+    CURRENT_STAGE=$((CURRENT_STAGE + 1))
+
+    align_right "Stage ${CURRENT_STAGE} - ${message}"
+}
+
 # -------------------------------------------------------------------------------- #
 # Draw the report footer on the screen. Part of the report generation.             #
 # -------------------------------------------------------------------------------- #
 
 function footer
 {
-    draw_line
-    center_text "Total: ${file_count}, OK: ${ok_count}, Failed: ${fail_count}, Skipped: $skip_count"
-    draw_line
+    stage "Report"
+    printf ' Total: %s, %sOK%s: %s, %sFailed%s: %s, %sSkipped%s: %s\n' "${file_count}" "${success}" "${normal}" "${ok_count}" "${error}" "${normal}" "${fail_count}" "${skipped}" "${normal}" "${skip_count}"
+    stage 'Complete'
 }
 
 # -------------------------------------------------------------------------------- #
@@ -230,12 +299,12 @@ function setup
 {
     export TERM=xterm
 
-    screen_width=$(tput cols)
+    screen_width=98
     bold="$(tput bold)"
     normal="$(tput sgr0)"
     error="$(tput setaf 1)"
     success="$(tput setaf 2)"
-    skip="$(tput setaf 6)"
+    skipped="$(tput setaf 6)"
 
     file_count=0
     ok_count=0
@@ -250,9 +319,10 @@ function setup
 # -------------------------------------------------------------------------------- #
 
 setup
-install_prerequisites
-header
 handle_parameters
+install_prerequisites
+get_version_information
+stage "${BANNER}"
 scan_files
 footer
 
@@ -267,3 +337,4 @@ exit $EXIT_VALUE
 # -------------------------------------------------------------------------------- #
 # This is the end - nothing more to see here.                                      #
 # -------------------------------------------------------------------------------- #
+
