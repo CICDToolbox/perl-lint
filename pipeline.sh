@@ -81,7 +81,7 @@ function check()
 
     file_count=$((file_count+1))
 
-    if errors=$( ${TEST_COMMAND} ${TEST_FLAGS} "${filename}" 2>&1 ); then
+    if errors=$( ${TEST_COMMAND} "${TEST_FLAGS}" "${filename}" 2>&1 ); then
         success "${filename}"
         ok_count=$((ok_count+1))
     else
