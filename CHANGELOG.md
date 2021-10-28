@@ -7,7 +7,9 @@ This changelog was automatically generated using [Caretaker](https://github.com/
 
 ### [Unreleased](https://github.com/CICDToolbox/perl-lint/commits/master)
 
-- update readme [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
+- shellcheck [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
+
+- update readme [`[14bb993]`](https://github.com/CICDToolbox/perl-lint/commit/14bb993838ea64b9e0b62b9dc01428ddce3033bc)
 
 - New logo [`[6617d6f]`](https://github.com/CICDToolbox/perl-lint/commit/6617d6fbb1e6c05f5037e2fb62297c0ff0882c16)
 
