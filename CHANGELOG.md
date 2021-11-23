@@ -9,6 +9,8 @@ This changelog was automatically generated using [Caretaker](https://github.com/
 
 - Fix find command [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
 
+- Fix find command [`[e566de4]`](https://github.com/CICDToolbox/perl-lint/commit/e566de418a9ea32e825770be3d3a6a25ed76f6a9)
+
 - Fix find command [`[0b6d212]`](https://github.com/CICDToolbox/perl-lint/commit/0b6d212f38fedc0f4617c70b5a25c4d94ec333a4)
 
 - shellcheck [`[ba9b770]`](https://github.com/CICDToolbox/perl-lint/commit/ba9b770efe04cd4122fd3d1b3d76d680d92d1e32)
