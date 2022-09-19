@@ -7,7 +7,9 @@ This changelog was automatically generated using [Caretaker](https://github.com/
 
 ### [Unreleased](https://github.com/CICDToolbox/perl-lint/commits/master)
 
-- Fix find command [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
+- Make errors easier to see and default to showing errors [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
+
+- Fix find command [`[1baa531]`](https://github.com/CICDToolbox/perl-lint/commit/1baa53179cd68a46c3af6a73d942d71cd4bb9a7f)
 
 - Fix find command [`[e566de4]`](https://github.com/CICDToolbox/perl-lint/commit/e566de418a9ea32e825770be3d3a6a25ed76f6a9)
 
