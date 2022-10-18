@@ -7,7 +7,9 @@ This changelog was automatically generated using [Caretaker](https://github.com/
 
 ### [Unreleased](https://github.com/CICDToolbox/perl-lint/commits/master)
 
-- Make errors easier to see and default to showing errors [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
+- Change the logic for skipping and showing skipped files [`[head]`](https://github.com/CICDToolbox/perl-lint/commit/)
+
+- Make errors easier to see and default to showing errors [`[f4dfa2d]`](https://github.com/CICDToolbox/perl-lint/commit/f4dfa2dff8b224fa3256f1d96d579b3df1a2d193)
 
 - Fix find command [`[1baa531]`](https://github.com/CICDToolbox/perl-lint/commit/1baa53179cd68a46c3af6a73d942d71cd4bb9a7f)
 
